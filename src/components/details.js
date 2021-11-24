@@ -7,6 +7,7 @@ import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import Paper from '@mui/material/Paper';
 
+import Table from './table';
 
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -140,7 +141,7 @@ export default function Album() {
           </Grid>
         </Container>
 
-        <Container maxWidth="sm">
+        <Container maxWidth="lg">
           <Typography
             component="h5"
             variant="h5"
@@ -148,52 +149,9 @@ export default function Album() {
             color="text.primary"
             gutterBottom
           >
-            Offer
+            Offer Ending 08/18/2014 09:11 pm
           </Typography>
-          <Stack
-            direction="row"
-            
-            spacing={2}
-            align="center"
-            justifyContent="center"
-          >
-            <Item>
-              <Typography variant="subtitle1" gutterBottom>
-                Tuna 3 KG
-              </Typography>
-            </Item>
-            <Item>A****</Item>
-          </Stack>
-          <br></br>
-          <Stack
-            direction="row"
-            
-            spacing={2}
-            align="center"
-            justifyContent="center"
-          >
-            <Item>
-              <Typography variant="subtitle1" gutterBottom>
-                Onion 10 KG
-              </Typography>
-            </Item>
-            <Item>M****</Item>
-          </Stack>
-          <br></br>
-          <Stack
-            direction="row"
-            
-            spacing={2}
-            align="center"
-            justifyContent="center"
-          >
-            <Item>
-              <Typography variant="subtitle1" gutterBottom>
-                Cream 10 Box
-              </Typography>
-            </Item>
-            <Item>P****</Item>
-          </Stack>
+          <Table />
         </Container>
 
       </main>
