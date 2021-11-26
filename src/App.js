@@ -101,15 +101,7 @@ export default function ButtonAppBar() {
                 </Link>
               </Menu>
             </div>
-            <IconButton
-              size="large"
-              edge="start"
-              color="secondary"
-              aria-label="menu"
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton>
+
           </Toolbar>
         </AppBar>
       </Box>
