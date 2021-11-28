@@ -1,31 +1,20 @@
 import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
-import CameraIcon from '@mui/icons-material/PhotoCamera';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-//import Link from '@mui/material/Link';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
-import Divider from '@mui/material/Divider';
+
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-import DirectionsIcon from '@mui/icons-material/Directions';
 import { styled } from '@mui/material/styles';
-import ButtonBase from '@mui/material/ButtonBase';
+
 
 const Img = styled('img')({
   margin: 'auto',
@@ -115,12 +104,13 @@ export default function Album() {
           >
             {cards.map((card) => (
               <Paper
-              elevation={3}
-               sx={{
-                p: 3,
-                margin: '10px',
-                maxWidth: 1000,
-                gap: 2}}>
+                elevation={3}
+                sx={{
+                  p: 3,
+                  margin: '10px',
+                  maxWidth: 1000,
+                  gap: 2
+                }}>
                 <Grid item key={card} container spacing={4} sm container >
                   <Grid item sx={{ width: 256, height: 256 }}
                     container
@@ -145,11 +135,11 @@ export default function Album() {
 
                       </Grid>
                       <Grid item xs container
-            direction="column"
-            justifyContent="center"
-            alignItems="flex-start">
+                        direction="column"
+                        justifyContent="center"
+                        alignItems="flex-start">
 
-                        <Link to={"/details"} style={{ textDecoration: 'none' }}>
+                        <Link to={"/post-news"} style={{ textDecoration: 'none' }}>
                           <Button size="small" variant="view">View</Button>
                         </Link>
                       </Grid>

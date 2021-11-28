@@ -21,6 +21,7 @@ import Home from "./components/home";
 import SignUp from "./components/signup";
 import SignIn from "./components/signin";
 import News from "./components/news";
+import PostNews from "./components/postnews";
 import EmployeeExchange from './components/employee';
 import StockExchange from './components/stockexchange';
 import Profile from './components/profile';
@@ -109,6 +110,7 @@ export default function ButtonAppBar() {
         <Route path="/signup" component={SignUp} />
         <Route path="/signin" component={SignIn} />
         <Route path="/news" component={News} />
+        <Route path="/post-news" component={PostNews} />
         <Route path="/employee-exchange" component={EmployeeExchange} />
         <Route path="/stock-exchange" component={StockExchange} />
         <Route path="/profile" component={Profile} />
