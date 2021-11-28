@@ -82,7 +82,7 @@ export default function Album() {
             <Grid item xs={12} sm container>
               <Grid item xs container direction="column" spacing={2}>
 
-              <TextField required
+                <TextField required
                   id="filled-basic"
                   label="Post title"
                   variant="standard" 

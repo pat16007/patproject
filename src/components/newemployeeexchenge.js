@@ -119,16 +119,12 @@ export default function Album() {
                 <br></br>
                 <TextField required
                   id="filled-basic"
-                  label="Skill"
+                  label="Duration"
                   variant="standard" />
                 <br></br>
                 <TextField required
                   id="filled-number"
-                  label="Number of Emplyoee"
-                  type="number"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
+                  label=" Emplyoee"
                   variant="standard"/>
                 <br></br>
                 <TextField required

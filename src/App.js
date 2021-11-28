@@ -10,9 +10,7 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import HomeIcon from '@mui/icons-material/Home';
 
@@ -25,9 +23,9 @@ import SignIn from "./components/signin";
 import News from "./components/news";
 import EmployeeExchange from './components/employee';
 import StockExchange from './components/stockexchange';
-
 import Profile from './components/profile';
-import Details from './components/details';
+import StockDetails from './components/stockdetails';
+import EmployeeDetails from './components/employeedetails';
 import NewStockExchange from './components/newstockexchange';
 import NewEmployeeExchange from './components/newemployeeexchenge';
 
@@ -66,7 +64,6 @@ export default function ButtonAppBar() {
               <Link to={"/news"} style={{ textDecoration: 'none' , color: '#FFF' }}> 
                 <Button color="secondary" variant="news">News</Button> 
               </Link>
-
             </Typography>
             
             <div>
@@ -115,7 +112,8 @@ export default function ButtonAppBar() {
         <Route path="/employee-exchange" component={EmployeeExchange} />
         <Route path="/stock-exchange" component={StockExchange} />
         <Route path="/profile" component={Profile} />
-        <Route path="/details" component={Details} />
+        <Route path="/stock-details" component={StockDetails} />
+        <Route path="/employee-details" component={EmployeeDetails} />
         <Route path="/newstockexchange" component={NewStockExchange} />
         <Route path="/newemployeeexchange" component={NewEmployeeExchange} />
       </Switch>

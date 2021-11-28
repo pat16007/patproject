@@ -20,9 +20,9 @@ function createData(number,image , offerdetails, by, date, contact) {
 }
 
 const rows = [
-  createData('1', <Img alt="complex" src="https://source.unsplash.com/random" />, "Tuna 3 Kg", "Jxxx", "07/18/2014", "+668xxxxxxxx"),
-  createData('2', <Img alt="complex" src="https://source.unsplash.com/random" />, "Onion 5 Kg", "Sxxx", "07/18/2014", "+668xxxxxxxx"),
-  createData('3', <Img alt="complex" src="https://source.unsplash.com/random" />, "Cream 100 ml 10 Box", "Mxxx", "07/18/2014", "+668xxxxxxxx"),
+  createData('1', <Img alt="complex" src="https://source.unsplash.com/random" />, "Tuna 3 Kg", "Jxxx", "07/18/2014", "+66800000000"),
+  createData('2', <Img alt="complex" src="https://source.unsplash.com/random" />, "Onion 5 Kg", "Sxxx", "07/18/2014", "+666800000000"),
+  createData('3', <Img alt="complex" src="https://source.unsplash.com/random" />, "Cream 100 ml 10 Box", "Mxxx", "07/18/2014", "+66800000000"),
 ];
 
 export default function BasicTable() {

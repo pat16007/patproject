@@ -128,7 +128,7 @@ export default function Album() {
                     </Typography>
                   </CardContent>
                   <CardActions>
-                    <Link to={"/details"} style={{ textDecoration: 'none' }}>
+                    <Link to={"/employee-details"} style={{ textDecoration: 'none' }}>
                       <Button size="small" variant="view">View</Button>
                     </Link>
                   </CardActions>

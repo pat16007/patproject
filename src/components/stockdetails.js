@@ -3,18 +3,15 @@ import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import Divider from '@mui/material/Divider';
 import Paper from '@mui/material/Paper';
-
-import Table from './table';
-
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 import { styled } from '@mui/material/styles';
+
+import StockTable from './stocktable';
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -117,7 +114,7 @@ export default function Album() {
                   +66800000000
                 </Typography>
                 <Typography variant="subtitle1" gutterBottom>
-                  08/18/2014 09:11 pm
+                  08/18/2021 09:11 pm
                 </Typography>
                 <Typography variant="subtitle1" gutterBottom>
                   Take All *Have to take all for take the items that listed
@@ -149,9 +146,9 @@ export default function Album() {
             color="text.primary"
             gutterBottom
           >
-            Offer Ending 08/18/2014 09:11 pm
+            Offer Ending 08/18/2021 09:11 pm
           </Typography>
-          <Table />
+          <StockTable />
         </Container>
 
       </main>
