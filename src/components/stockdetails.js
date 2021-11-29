@@ -129,7 +129,7 @@ export default function Album() {
                 <br></br>
                 <Grid item >
                   <Button
-                    variant="contained">Make a offer
+                    variant="contained">Make an offer
                   </Button>
                 </Grid>
               </Grid>

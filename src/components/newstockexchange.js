@@ -148,7 +148,7 @@ export default function Album() {
                   <br></br>
                   <Link to={"/stock-exchange"} style={{ textDecoration: 'none' , color: '#000000' }}>
                   <Button color="grey"
-                    variant="contained">Cancle
+                    variant="contained">Cancel
                   </Button>
                   </Link>
                   <Button
