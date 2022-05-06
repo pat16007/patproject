@@ -13,7 +13,6 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-//import Link from '@mui/material/Link';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
@@ -24,6 +23,13 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import DirectionsIcon from '@mui/icons-material/Directions';
+
+import { useState } from 'react';
+import { useContext } from 'react';
+import { useEffect } from 'react';
+import { AuthContext } from '../Auth';
+import firebaseConfig from '../config';
+import firebase from 'firebase/compat/app';
 
 function Copyright() {
   return (
@@ -38,11 +44,38 @@ function Copyright() {
   );
 }
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const theme = createTheme();
 
 export default function Album() {
+
+  const [search, setSearch] = useState("");
+  const [cards, setCards] = useState(null);
+
+  useEffect(() => {
+    const ref = firebase.database().ref("Employee Exchange");
+
+    ref.on("value", function (snapshot) {
+      const cardData = []
+      snapshot.forEach(data => {
+        cardData.push({
+          id: data.key,
+          ...data.val()
+        });
+      })
+      setCards(cardData)
+    });
+
+  }, [])
+
+  const handleChangeSearch = (event) => {
+    setSearch(event.target.value.toLowerCase());
+  };
+  const searchedCard = search === "" ? cards : cards?.filter(card => {
+    return card.title?.toLowerCase().includes(search) || card.item?.toLowerCase().includes(search) || card.district?.toLowerCase().includes(search) || card.province?.toLowerCase().includes(search)
+
+  })
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -66,7 +99,7 @@ export default function Album() {
               Employee Exchange
             </Typography>
             <Typography variant="h5" align="center" color="text.secondary" paragraph>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Posuere lorem ipsum dolor sit amet consectetur. Tellus mauris a diam maecenas sed enim ut. Eros donec ac odio tempor. Donec ultrices tincidunt arcu non sodales neque sodales ut etiam.
+              Function created for exchange or sharing your employees of your businesses with others. This function allows for share of employees across businesses to help businesses find the right employee for the job very similar to outsourcing but done though exchange.
             </Typography>
 
             <Grid
@@ -83,6 +116,7 @@ export default function Album() {
                 >
                   <InputBase
                     sx={{ ml: 1, flex: 1 }}
+                    onChange={handleChangeSearch}
                     placeholder="Search"
                   />
                   <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
@@ -105,34 +139,38 @@ export default function Album() {
         <Container sx={{ py: 8 }} maxWidth="md">
           {/* End hero unit */}
           <Grid container spacing={4}>
-            {cards.map((card) => (
+            {searchedCard?.map((card) => (
               <Grid item key={card} xs={12} sm={6} md={4}>
-                <Card
-                  sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                >
-                  <CardMedia
-                    component="img"
-                    sx={{
-                      // 16:9
-                      pt: '0%',
-                    }}
-                    image="https://source.unsplash.com/random"
-                    alt="random"
-                  />
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography gutterBottom variant="h5" component="h2">
-                      Heading
-                    </Typography>
-                    <Typography>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Link to={"/employee-details"} style={{ textDecoration: 'none' }}>
-                      <Button size="small" variant="view">View</Button>
-                    </Link>
-                  </CardActions>
-                </Card>
+                <Link to={"/employee-details?id=" + card.id} style={{ textDecoration: 'none' }}>
+                  <Card
+                    sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+                  >
+                    <CardMedia
+                      component="img"
+                      sx={{
+                        // 16:9
+                        pt: '0%',
+                      }}
+                      image={card.imgUrl}
+                      alt="random"
+                    />
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Typography gutterBottom variant="h5" component="h2">
+                        {card.title}
+                      </Typography>
+                      <Typography>
+                        Employee : {card.employee}
+                      </Typography>
+                      <Typography>
+                        Employee Number : {card.employeeNumber}
+                      </Typography>
+                      <Typography>
+                        Location : {card.district}, {card.province}
+                      </Typography>
+                    </CardContent>
+
+                  </Card>
+                </Link>
               </Grid>
             ))}
           </Grid>

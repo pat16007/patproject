@@ -7,11 +7,16 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Link, useLocation } from "react-router-dom";
 
 import { styled } from '@mui/material/styles';
+import DeleteBTN from './deletebtn';
 
 import StockTable from './stocktable';
+import { useState, useEffect, useContext } from 'react';
+import firebase from 'firebase/compat/app';
+import { AuthContext } from '../Auth';
+import { useHistory } from "react-router-dom";
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -27,6 +32,11 @@ const Img = styled('img')({
   maxHeight: '100%',
 });
 
+function useQuery() {
+  const { search } = useLocation();
+
+  return React.useMemo(() => new URLSearchParams(search), [search]);
+}
 
 function Copyright() {
   return (
@@ -45,129 +55,192 @@ function Copyright() {
 const theme = createTheme();
 
 export default function Album() {
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <main>
-        {/* Hero unit */}
-        <Box
-          sx={{
-            bgcolor: 'background.paper',
-            pt: 8,
-            pb: 6,
-          }}
-        >
-          <Container maxWidth="sm">
-            <Typography
-              component="h1"
-              variant="h3"
-              align="center"
-              color="text.primary"
-              gutterBottom
-            >
-              Listing Details
-            </Typography>
+  let history = useHistory();
+  const query = useQuery();
+  const [postData, setPostData] = useState(null)
 
-          </Container>
-        </Box>
-        <Container sx={{ py: 8 }} maxWidth="md">
-          {/* End hero unit */}
-          <Grid container spacing={4}>
-            <Grid item sx={{ width: 256, height: 256 }}>
-              <Img alt="complex" src="https://source.unsplash.com/random" />
-            </Grid>
-            <Grid item xs={12} sm container>
-              <Grid item xs container direction="column" spacing={2}>
-                <Grid item xs>
-                  <Typography variant="subtitle1" gutterBottom >
-                    Company Name :
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Email :
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Phone :
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Ending :
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Condition :
-                  </Typography>
-                  <br></br>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Item :
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Location :
-                  </Typography>
-                </Grid>
-              </Grid>
-              <Grid item xs>
-                <Typography variant="subtitle1" gutterBottom>
-                  John Doe
-                </Typography>
-                <Typography variant="subtitle1" gutterBottom>
-                  john.doe@email.com
-                </Typography>
-                <Typography variant="subtitle1" gutterBottom>
-                  +66800000000
-                </Typography>
-                <Typography variant="subtitle1" gutterBottom>
-                  08/18/2021 09:11 pm
-                </Typography>
-                <Typography variant="subtitle1" gutterBottom>
-                  Take All *Have to take all for take the items that listed
-                </Typography>
-                <Typography variant="subtitle1" gutterBottom>
-                  Tomato Can : 3 KG
-                  Salmon : 5 KG
-                </Typography>
-                <Typography variant="subtitle1" gutterBottom>
-                  Wattana
-                </Typography>
-                <br></br>
-                <Grid item >
-                  <Button
-                    variant="contained">Make an offer
-                  </Button>
-                </Grid>
-              </Grid>
 
-            </Grid>
-          </Grid>
-        </Container>
+  useEffect(() => {
+    const ref = firebase.database().ref("Material Exchange");
+    ref.once('value').then((snapshot) => {
+      snapshot.forEach(function (data) {
+        if (data.key == query.get("id")) {
+          setPostData(data.val())
+        }
+      });
+    });
+  }, [query])
 
-        <Container maxWidth="lg">
+  const [user, setUser] = useState(null);
+
+  const { currentUser } = useContext(AuthContext);
+
+
+  useEffect(() => {
+    if (currentUser) {
+      const ref = firebase.database().ref("Profile");
+      ref.orderByChild("uid").equalTo(currentUser.multiFactor.user.uid).on("child_added", function (snapshot) {
+        setUser(snapshot.val());
+      });
+    }
+
+  }, [currentUser])
+    ;
+
+  const deleteData = () => {
+    const ref = firebase.database().ref("Material Exchange");
+    ref.once('value').then((snapshot) => {
+      snapshot.forEach(function (data) {
+        if (data.key == query.get("id")) {
+          data.ref.remove();
+        }
+      });
+    });
+    const Offerref = firebase.database().ref("Offer");
+    Offerref.once('value').then((snapshot) => {
+      snapshot.forEach(function (data) {
+        if (data.val().offerid == query.get("id")) {
+          data.ref.remove();
+        }
+      });
+    });
+    history.push("/stock-exchange")
+  }
+
+  return <ThemeProvider theme={theme}>
+    <CssBaseline />
+    <main>
+      {/* Hero unit */}
+      <Box
+        sx={{
+          bgcolor: 'background.paper',
+          pt: 8,
+          pb: 6,
+        }}
+      >
+        <Container maxWidth="sm">
           <Typography
-            component="h5"
-            variant="h5"
+            component="h1"
+            variant="h3"
             align="center"
             color="text.primary"
             gutterBottom
           >
-            Offer Ending 08/18/2021 09:11 pm
+            Listing Details
           </Typography>
-          <StockTable />
+
         </Container>
-
-      </main>
-
-      {/* Footer */}
-      <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
-        <Typography variant="h6" align="center" gutterBottom>
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          align="center"
-          color="text.secondary"
-          component="p"
-        >
-          SME social
-        </Typography>
-        <Copyright />
       </Box>
-      {/* End footer */}
-    </ThemeProvider>
-  );
+      <Container sx={{ py: 8 }} maxWidth="md">
+        {/* End hero unit */}
+        <Grid container spacing={4}>
+          <Grid item sx={{ width: 256, height: 256 }}>
+            <Img alt="complex" src={postData?.imgUrl} />
+          </Grid>
+          <Grid item xs={12} sm container>
+            <Grid item xs container direction="column" spacing={2}>
+              <Grid item xs>
+                <Typography variant="subtitle1" gutterBottom >
+                  Company Name :
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  Email :
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  Phone :
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  Ending :
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  Condition :
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  Item :
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  Location :
+                </Typography>
+                <br></br>
+                <Grid item >
+                  <Link to={"/stock-exchange"} style={{ textDecoration: 'none' }}>
+                    <Button variant="contained">Back </Button>
+                  </Link>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs>
+              <Typography variant="subtitle1" gutterBottom>
+                {postData?.companyName}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                {postData?.email}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                {postData?.phone}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                {postData?.endDate && new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(postData.endDate).toString()}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                {postData?.condition}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                {postData?.item}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                {postData?.district}, {postData?.province}
+              </Typography>
+              <br></br>
+              <Grid item >
+
+                <Link to={"/createoffer?id=" + query.get("id")} style={{ textDecoration: 'none' }}>
+                  <Button variant="contained">Make an Offer </Button>
+                </Link>
+              </Grid>
+            </Grid>
+
+          </Grid>
+        </Grid>
+      </Container>
+
+      <Container maxWidth="lg">
+        <Typography
+          component="h5"
+          variant="h5"
+          align="center"
+          color="text.primary"
+          gutterBottom
+        >
+          Offer Ending {postData?.endDate && new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(postData.endDate).toString()}
+        </Typography>
+        <StockTable id={query.get("id")} />
+
+      </Container>
+      <br></br>
+      {user?.uid == postData?.uid ?
+        <Grid align="center">
+          <Button variant="contained" onClick={deleteData}>Delete Post</Button>
+        </Grid>
+        : null
+      }
+    </main>
+
+    {/* Footer */}
+    <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
+      <Typography variant="h6" align="center" gutterBottom>
+      </Typography>
+      <Typography
+        variant="subtitle1"
+        align="center"
+        color="text.secondary"
+        component="p"
+      >
+        SME social
+      </Typography>
+      <Copyright />
+    </Box>
+    {/* End footer */}
+  </ThemeProvider>
+    ;
 }

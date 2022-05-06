@@ -7,25 +7,62 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
+import Card from '@mui/material/Card';
+import CardMedia from '@mui/material/CardMedia';
+import Box from '@mui/material/Box';
+
+import { useState, useEffect, useContext } from 'react';
+import firebase from 'firebase/compat/app';
+import { AuthContext } from '../Auth';
 
 const Img = styled('img')({
-    margin: 'auto',
-    display: 'block',
-    maxWidth: '50%',
-    maxHeight: '50%',
-  });
+  margin: 'auto',
+  display: 'block',
+  maxWidth: '50%',
+  maxHeight: '50%',
+});
 
-function createData(number,image , offerdetails, by, date, contact) {
-  return { number, image, offerdetails, by, date, contact,};
-}
 
-const rows = [
-  createData('1', <Img alt="complex" src="https://source.unsplash.com/random" />, "Tuna 3 Kg", "Jxxx", "07/18/2014", "+66800000000"),
-  createData('2', <Img alt="complex" src="https://source.unsplash.com/random" />, "Onion 5 Kg", "Sxxx", "07/18/2014", "+666800000000"),
-  createData('3', <Img alt="complex" src="https://source.unsplash.com/random" />, "Cream 100 ml 10 Box", "Mxxx", "07/18/2014", "+66800000000"),
-];
 
-export default function BasicTable() {
+
+
+export default function BasicTable({ id }) {
+
+  const [offer, setOferr] = useState(null);
+
+  const [user, setUser] = useState(null);
+
+
+  const { currentUser } = useContext(AuthContext);
+
+  if (currentUser) {
+    useEffect(() => {
+      const ref = firebase.database().ref("Profile");
+      ref.orderByChild("uid").equalTo(currentUser.multiFactor.user.uid).on("child_added", function (snapshot) {
+        setUser(snapshot.val());
+      });
+
+
+    }, [currentUser])
+      ;
+  }
+
+  useEffect(() => {
+    const ref = firebase.database().ref("Offer").orderByChild("offerid").equalTo(id);
+
+    ref.on("value", function (snapshot) {
+      const offerData = []
+      snapshot.forEach(data => {
+        offerData.push({
+          id: data.key,
+          ...data.val()
+        });
+      })
+      setOferr(offerData)
+    });
+
+  }, [])
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -37,23 +74,49 @@ export default function BasicTable() {
             <TableCell align="center">By</TableCell>
             <TableCell align="center">Date</TableCell>
             <TableCell align="center">Contact</TableCell>
-            
+            {/* <TableCell align="center"></TableCell> */}
+
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {offer?.map((row, index) => (
             <TableRow
-              key={row.number}
+              key={index + 1}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell component="th" scope="row">
-                {row.number}
+                {index + 1}
               </TableCell>
-              <TableCell align="center">{row.image}</TableCell>
-              <TableCell align="left">{row.offerdetails}</TableCell>
-              <TableCell align="center">{row.by}</TableCell>
-              <TableCell align="center">{row.date}</TableCell>
-              <TableCell align="center">{row.contact}</TableCell>
+              <TableCell align="center">
+                {row.imgUrl ?
+                  <Box align="center"
+                    sx={{ height: '50px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                  >
+                    <CardMedia
+
+                      component="img"
+                      sx={{
+                        // 16:9
+                        height: '50px', width: "50px",
+                        pt: '0%',
+                      }}
+                      src={row.imgUrl}
+                    />
+                  </Box>
+                  : null
+                }
+              </TableCell>
+              <TableCell align="left">{row.item}</TableCell>
+              <TableCell align="center">{row.companyName}</TableCell>
+              <TableCell align="center">{row.date && new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(row.date).toString()}</TableCell>
+              {user?.uid == row?.uid ?
+                <TableCell align="center">{row.phone}</TableCell>
+                : <TableCell align="center">xxxxxxxxxx</TableCell>
+              }
+
+              {/* <TableCell align="center">
+              <Button variant="contained" onClick={deleteData}>Delete Post</Button>
+                </TableCell> */}
 
             </TableRow>
           ))}

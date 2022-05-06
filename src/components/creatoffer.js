@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
@@ -8,7 +7,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Link, useLocation } from "react-router-dom";
 
 import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
@@ -22,15 +21,14 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
-import { useState } from 'react';
-import { useContext } from 'react';
-import { useEffect } from 'react';
-import { AuthContext } from '../Auth';
-import firebaseConfig from '../config';
-import firebase from 'firebase/compat/app';
 
+import { useState, useEffect, useContext } from 'react';
+import firebase from 'firebase/compat/app';
+import { AuthContext } from '../Auth';
 import 'firebase/compat/storage';
+
 import { v4 as uuidv4 } from 'uuid';
+
 
 const Input = styled('input')({
   display: 'none',
@@ -43,7 +41,11 @@ const Img = styled('img')({
   maxHeight: '100%',
 });
 
+function useQuery() {
+  const { search } = useLocation();
 
+  return React.useMemo(() => new URLSearchParams(search), [search]);
+}
 
 function Copyright() {
   return (
@@ -61,25 +63,38 @@ function Copyright() {
 
 const theme = createTheme();
 
-const NewStockExchange = () => {
+
+
+const NewOffer = () => {
   const [user, setUser] = useState(null);
   const { currentUser } = useContext(AuthContext);
 
-  const [title, setTitle] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [date, setDate] = useState(new Date());
-  const [condition, setCondition] = useState('');
   const [item, setItem] = useState('');
   const [location, setLocation] = useState('');
+  const [image, setImage] = useState(null);
 
   const [subdistrict, setSubdistrict] = useState(null);
   const [district, setDistrict] = useState(null);
   const [province, setProvince] = useState(null);
   const [zipcode, setZipcode] = useState(null);
 
-  const [image, setImage] = useState(null);
+
+  const query = useQuery();
+
+
+  // useEffect(() => {
+  //   const ref = firebase.database().ref("Employee Exchange");
+  //   ref.once('value').then((snapshot) => {
+  //     snapshot.forEach(function (data) {
+  //       if (data.key == query.get("id")) {
+  //         setPostData(data.val())
+  //       }
+  //     });
+  //   });
+  // }, [query])
 
 
   if (currentUser) {
@@ -102,10 +117,6 @@ const NewStockExchange = () => {
       ;
   }
 
-
-  const handleOnChangeTitle = (e) => {
-    setTitle(e.target.value);
-  }
   const handleOnChangeCompanyName = (e) => {
     setCompanyName(e.target.value);
   }
@@ -114,9 +125,6 @@ const NewStockExchange = () => {
   }
   const handleOnChangePhone = (e) => {
     setPhone(e.target.value);
-  }
-  const handleChangeCondition = (event) => {
-    setCondition(event.target.value);
   }
   const handleOnChangeItem = (e) => {
     setItem(e.target.value);
@@ -128,45 +136,39 @@ const NewStockExchange = () => {
     setImage(event.target.files[0]);
   };
 
-
-  const CrateMaterialExchange = () => {
+  const CreateOffer = () => {
     console.log(uuidv4())
     const storage = firebase.storage();
     const storageRef = storage.ref().child(uuidv4());
     storageRef.put(image).then((snapshot) => {
       storageRef.getDownloadURL().then((imgUrl) => {
-        const MaterialExchangeRef = firebase.database().ref('Material Exchange')
-        const MaterialExchange = {
+        const OfferRef = firebase.database().ref('Offer');
+        const offerExchange = {
 
-          title,
+          offerid: query.get("id"),
           companyName,
-          email,
           phone,
-          condition,
+          date: Date.now(),
           item,
-          //location,
+          location,
+          uid: user.uid,
           district,
           province,
           zipcode,
-          endDate: date.getTime(),
-          date: Date.now(),
-          uid: user.uid,
           imgUrl,
         };
 
-        MaterialExchangeRef.push(MaterialExchange);
+        OfferRef.push(offerExchange);
 
       });
 
     });
 
-
-
   };
 
   const imageurl = image ? URL.createObjectURL(image) : "https://firebasestorage.googleapis.com/v0/b/sme-social-4d6db.appspot.com/o/27002.jpg?alt=media&token=421a8575-84d7-4c64-9879-5186ef877b8c"
 
-  if (!currentUser || !user) {
+  if (!currentUser) {
     return <ThemeProvider theme={theme}>
       <CssBaseline />
       <main>
@@ -194,7 +196,7 @@ const NewStockExchange = () => {
               justifyContent="center"
               alignItems="center">
               <br></br>
-              <Link to={"/stock-exchange"} style={{ textDecoration: 'none', color: '#000000' }}>
+              <Link to={"/stock-details?id=" + query.get("id")} style={{ textDecoration: 'none', color: '#000000' }}>
                 <Button color="grey"
                   variant="contained">Go Back
                 </Button>
@@ -248,7 +250,7 @@ const NewStockExchange = () => {
               color="text.primary"
               gutterBottom
             >
-              New Material Exchange
+              Offer
             </Typography>
 
           </Container>
@@ -276,16 +278,6 @@ const NewStockExchange = () => {
 
                 <TextField
                   required
-                  onChange={handleOnChangeTitle}
-                  value={title}
-                  id="title"
-                  name="title"
-                  label="Post title"
-                  variant="standard"
-                />
-                <br></br>
-                <TextField
-                  required
                   onChange={handleOnChangeCompanyName}
                   value={companyName}
                   id="companyName"
@@ -301,6 +293,7 @@ const NewStockExchange = () => {
                   id="email"
                   name="email"
                   label="Email"
+                  defaultValue="john.doe@email.com"
                   variant="filled"
                 />
                 <br></br>
@@ -311,34 +304,10 @@ const NewStockExchange = () => {
                   id="phone"
                   name="phone"
                   label="Phone"
+                  defaultValue="+66800000000"
                   variant="filled"
                 />
                 <br></br>
-                <LocalizationProvider dateAdapter={AdapterDateFns} >
-                  <DateTimePicker
-                    renderInput={(props) => <TextField id="date" name="date" variant="standard"{...props} />}
-                    label="Ending Date"
-                    value={date}
-                    onChange={(newValue) => {
-                      setDate(newValue);
-                    }}
-                  />
-                </LocalizationProvider>
-                <br></br>
-                <FormControl variant="standard" fullWidth required>
-                  <InputLabel id="condition">Condition</InputLabel>
-                  <Select
-                    labelId="condition"
-                    id="condition"
-                    label="Condition"
-                    value={condition}
-                    onChange={handleChangeCondition}
-                  >
-                    <MenuItem value={"Have to take all item"}>Have to take all item</MenuItem>
-                    <MenuItem value={"Can separate item"} >Can separate item</MenuItem>
-                  </Select>
-                </FormControl>
-
                 <TextField
                   required
                   onChange={handleOnChangeItem}
@@ -348,10 +317,6 @@ const NewStockExchange = () => {
                   label="Item"
                   variant="standard" />
                 <br></br>
-                <Typography variant="subtitle1" gutterBottom>
-                  *Please specify each item and amount.
-                </Typography>
-
                 <FormControl variant="standard" fullWidth required>
                   <InputLabel id="location">Location</InputLabel>
                   <Select
@@ -371,15 +336,15 @@ const NewStockExchange = () => {
                   justifyContent="space-between"
                   alignItems="center">
                   <br></br>
-                  <Link to={"/stock-exchange"} style={{ textDecoration: 'none', color: '#000000' }}>
+                  <Link to={"/stock-details?id=" + query.get("id")} style={{ textDecoration: 'none', color: '#000000' }}>
                     <Button color="grey"
                       variant="contained">Cancel
                     </Button>
                   </Link>
-                  <Link to={"/stock-exchange"} style={{ textDecoration: 'none' }}>
+                  <Link to={"/stock-details?id=" + query.get("id")} style={{ textDecoration: 'none' }}>
                     <Button
-                      onClick={CrateMaterialExchange}
-                      variant="contained">Post
+                      onClick={CreateOffer}
+                      variant="contained">Offer
                     </Button>
                   </Link>
                 </Grid>
@@ -408,4 +373,4 @@ const NewStockExchange = () => {
     </ThemeProvider>
   );
 }
-export default NewStockExchange;
+export default NewOffer;

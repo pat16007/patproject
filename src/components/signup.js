@@ -13,6 +13,14 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+import { useState } from 'react';
+import { BrowserRouter as Redirect } from 'react-router-dom'
+import firebaseConfig from '../config';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/database';
+import { useHistory } from "react-router-dom";
+
+
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -28,16 +36,74 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-export default function SignUp() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+const SignUp = () => {
+  let history = useHistory();
+  const [currentUser, setCurrentUser] = useState(null);
+
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [phone, setPhone] = useState('');
+
+  const subdistrict = "";
+  const district = "";
+  const province = "";
+  const zipcode = "";
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const { email, password } = e.target.elements;
+
+    try {
+
+      firebaseConfig.auth().createUserWithEmailAndPassword(email.value, password.value).then((userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+
+        setCurrentUser(true)
+
+        const profileRef = firebase.database().ref('Profile');
+        const profile = {
+          firstName,
+          lastName,
+          companyName,
+          phone,
+          subdistrict,
+          district,
+          province,
+          zipcode,
+
+          uid: user.uid,
+          email: user.email,
+        };
+
+        profileRef.push(profile);
+
+
+        history.push("/home")
+      })
+
+
+    } catch (error) {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+    }
+  }
+
+
+  const handleOnChangeFirstName = (e) => {
+    setFirstName(e.target.value);
+  }
+  const handleOnChangeLastName = (e) => {
+    setLastName(e.target.value);
+  }
+  const handleOnChangeCompanyName = (e) => {
+    setCompanyName(e.target.value);
+  }
+  const handleOnChangePhone = (e) => {
+    setPhone(e.target.value);
   };
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -51,16 +117,22 @@ export default function SignUp() {
             alignItems: 'center',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
+
           <Typography component="h1" variant="h5">
-            Sign up
+            Register
+          </Typography>
+          <Typography component="h1" variant="h5">
+            This is the demo website
+          </Typography>
+          <Typography component="h1" variant="h5">
+            DO NOT USE YOUR REAL EMAIL
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
+                  onChange={handleOnChangeFirstName}
+                  value={firstName}
                   autoComplete="given-name"
                   name="firstName"
                   required
@@ -72,6 +144,8 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
+                  onChange={handleOnChangeLastName}
+                  value={lastName}
                   required
                   fullWidth
                   id="lastName"
@@ -82,13 +156,15 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  onChange={handleOnChangeCompanyName}
+                  value={companyName}
                   required
                   fullWidth
-                  id="company"
+                  id="companyName"
                   label="Company Name"
-                  name="company"
+                  name="companyName"
                 />
-                </Grid>
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   required
@@ -101,6 +177,8 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  onChange={handleOnChangePhone}
+                  value={phone}
                   required
                   fullWidth
                   id="phone"
@@ -116,14 +194,11 @@ export default function SignUp() {
                   label="Password"
                   type="password"
                   id="password"
-                  autoComplete="new-password"
+                //autoComplete="new-password"
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
+
               </Grid>
             </Grid>
             <Button
@@ -139,8 +214,25 @@ export default function SignUp() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 5 }} />
       </Container>
-    </ThemeProvider>
+      {/* Footer */}
+      <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
+        <Typography variant="h6" align="center" gutterBottom>
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          align="center"
+          color="text.secondary"
+          component="p"
+        >
+          SME social
+        </Typography>
+        <Copyright />
+      </Box>
+      {/* End footer */}
+    </ThemeProvider >
   );
 }
+
+
+export default SignUp;

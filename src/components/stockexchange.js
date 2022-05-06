@@ -17,6 +17,13 @@ import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 
+import { useState } from 'react';
+import { useContext } from 'react';
+import { useEffect } from 'react';
+import { AuthContext } from '../Auth';
+import firebaseConfig from '../config';
+import firebase from 'firebase/compat/app';
+
 
 function Copyright() {
   return (
@@ -31,11 +38,39 @@ function Copyright() {
   );
 }
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const theme = createTheme();
 
 export default function Album() {
+
+
+  const [search, setSearch] = useState("");
+  const [cards, setCards] = useState(null);
+
+  useEffect(() => {
+    const ref = firebase.database().ref("Material Exchange");
+
+    ref.on("value", function (snapshot) {
+      const cardData = []
+      snapshot.forEach(data => {
+        cardData.push({
+          id: data.key,
+          ...data.val()
+        });
+      })
+      setCards(cardData)
+    });
+
+  }, [])
+
+  const handleChangeSearch = (event) => {
+    setSearch(event.target.value.toLowerCase());
+  };
+  const searchedCard = search === "" ? cards : cards?.filter(card => {
+    return card.title?.toLowerCase().includes(search) || card.item?.toLowerCase().includes(search) || card.district?.toLowerCase().includes(search) || card.province?.toLowerCase().includes(search)
+
+  })
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -56,10 +91,10 @@ export default function Album() {
               color="text.primary"
               gutterBottom
             >
-              Stock Exchange
+              Material Exchange
             </Typography>
             <Typography variant="h5" align="center" color="text.secondary" paragraph>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Posuere lorem ipsum dolor sit amet consectetur. Tellus mauris a diam maecenas sed enim ut. Eros donec ac odio tempor. Donec ultrices tincidunt arcu non sodales neque sodales ut etiam.
+              Function created for exchanging your material of your businesses with other businesses. This function allows businesses to exchange materials that they do not need for materials that other companies do not need. This allows materials to be used efficiently by companies that want it and the materials will not go to waste.
             </Typography>
 
             <Grid
@@ -76,6 +111,7 @@ export default function Album() {
                 >
                   <InputBase
                     sx={{ ml: 1, flex: 1 }}
+                    onChange={handleChangeSearch}
                     placeholder="Search"
                   />
                   <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
@@ -85,67 +121,67 @@ export default function Album() {
               </Grid>
               <br></br>
               <Grid item xs={4}>
-              <Link to={"/newstockexchange"} style={{ textDecoration: 'none' }}>
-                <Button variant="contained">New Stock Exchange </Button>
-              </Link>
+                <Link to={"/newstockexchange"} style={{ textDecoration: 'none' }}>
+                  <Button variant="contained">New Materials Exchange </Button>
+                </Link>
               </Grid>
+            </Grid>
+          </Container>
+
+        </Box>
+        <Container sx={{ py: 8 }} maxWidth="md">
+          {/* End hero unit */}
+          <Grid container spacing={4}>
+            {searchedCard?.map((card) => (
+              <Grid item key={card} xs={12} sm={6} md={4}>
+                <Link to={"/stock-details?id=" + card.id} style={{ textDecoration: 'none' }}>
+                  <Card
+                    sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+                  >
+                    <CardMedia
+                      component="img"
+                      sx={{
+                        // 16:9
+                        pt: '0%',
+                      }}
+                      image={card.imgUrl}
+                      alt="random"
+                    />
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Typography gutterBottom variant="h5" component="h2">
+                        {card.title}
+                      </Typography>
+                      <Typography>
+                        Items : {card.item}
+                      </Typography>
+                      <Typography>
+                        Location : {card.district}, {card.province}
+                      </Typography>
+                    </CardContent>
+
+                  </Card>
+                </Link>
+              </Grid>
+            ))}
           </Grid>
         </Container>
+      </main>
+      {/* Footer */}
+      <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
+        <Typography variant="h6" align="center" gutterBottom>
 
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          align="center"
+          color="text.secondary"
+          component="p"
+        >
+          SME social
+        </Typography>
+        <Copyright />
       </Box>
-      <Container sx={{ py: 8 }} maxWidth="md">
-        {/* End hero unit */}
-        <Grid container spacing={4}>
-          {cards.map((card) => (
-            <Grid item key={card} xs={12} sm={6} md={4}>
-              <Card
-                sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-              >
-                <CardMedia
-                  component="img"
-                  sx={{
-                    // 16:9
-                    pt: '0%',
-                  }}
-                  image="https://source.unsplash.com/random"
-                  alt="random"
-                />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography gutterBottom variant="h5" component="h2">
-                    Heading
-                  </Typography>
-                  <Typography>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                    eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Link to={"/stock-details"} style={{ textDecoration: 'none' }}>
-                    <Button size="small" variant="view">View</Button>
-                  </Link>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-    </main>
-      {/* Footer */ }
-  <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
-    <Typography variant="h6" align="center" gutterBottom>
-
-    </Typography>
-    <Typography
-      variant="subtitle1"
-      align="center"
-      color="text.secondary"
-      component="p"
-    >
-      SME social
-    </Typography>
-    <Copyright />
-  </Box>
-  {/* End footer */ }
+      {/* End footer */}
     </ThemeProvider >
   );
 }
